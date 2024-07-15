@@ -4,7 +4,7 @@
             <div class="item_backround1" :style="`background: ${item.color1}`"></div>
             <div class="item_backround2" :style="`background: ${item.color2}`"></div>
         </div>
-        <div class="counter">
+        <div v-if="item.count" class="counter">
             <div class="count_border"></div>
             <div class="itemCounter">{{item.count}}</div>
         </div>

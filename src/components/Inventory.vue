@@ -2,8 +2,13 @@
     <div class="inventory-container">
         <div class="inventory">
             <div v-for="(row, rowIndex) in grid" :key="rowIndex" class="row" :style="itemStyle(rowIndex)">
-                <div v-for="(item, colIndex) in row" :key="colIndex" class="item" :style="itemStyle(rowIndex, colIndex)">
-                    <InventoryItem @click="showModal(item, colIndex)" v-if="item" :item="item" :index="item.index" />
+                <div v-for="(item, colIndex) in row" 
+                :key="colIndex" 
+                class="item" 
+                :style="itemStyle(rowIndex, colIndex)"
+                v-draggable="{ index: rowIndex * cols + colIndex, onDragStart: startDrag, onDrop: endDrag }"
+                >
+                    <InventoryItem @click="showModal(item, rowIndex * cols + colIndex)" v-if="item" :item="item" :index="item.index" />
                 </div>
             </div>
         </div>
@@ -18,6 +23,7 @@ import { ref, computed } from 'vue';
 import { useInventoryStore } from '../store/inventory.js';
 import InventoryItem from './InventoryItem.vue';
 import inventoryModal from './inventoryModal.vue';
+import draggable from 'vuedraggable';
 
 const inventoryStore = useInventoryStore();
 const items = ref(inventoryStore.items);
@@ -27,6 +33,8 @@ const selectedItem = ref(null);
 
 const rows = 5;
 const cols = 5;
+
+let dragStartIndex = ref(null);
 
 // Вычисляемое свойство для формирования сетки
 const grid = computed(() => {
@@ -67,6 +75,16 @@ function removeItem(index, count) {
     console.log("test");
     inventoryStore.removeItem(index, count);
     hideModal();
+  }
+}
+function startDrag(index) {
+  dragStartIndex.value = index;
+}
+function endDrag(newIndex) {
+  const oldIndex = dragStartIndex.value;
+  if (newIndex !== oldIndex && newIndex >= 0 && newIndex < items.value.length) {
+    inventoryStore.moveItem(oldIndex, newIndex);
+    dragStartIndex.value = null;
   }
 }
 </script>
