@@ -3,7 +3,7 @@
         <div class="inventory">
             <div v-for="(row, rowIndex) in grid" :key="rowIndex" class="row" :style="itemStyle(rowIndex)">
                 <div v-for="(item, colIndex) in row" :key="colIndex" class="item" :style="itemStyle(rowIndex, colIndex)">
-                    <InventoryItem @click="showModal(item, index)" v-if="item" :item="item" :index="item.index" />
+                    <InventoryItem @click="showModal(item, colIndex)" v-if="item" :item="item" :index="item.index" />
                 </div>
             </div>
         </div>
@@ -15,12 +15,12 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useInventoryStore } from '../stores/inventory.js';
+import { useInventoryStore } from '../store/inventory.js';
 import InventoryItem from './InventoryItem.vue';
 import inventoryModal from './inventoryModal.vue';
 
-const store = useInventoryStore();
-const items = ref(store.items);
+const inventoryStore = useInventoryStore();
+const items = ref(inventoryStore.items);
 
 const showDetail = ref(false);
 const selectedItem = ref(null);
@@ -51,18 +51,23 @@ function itemStyle(rowIndex, colIndex) {
 }
 
 function showModal(item, index) {
-  selectedItem.value = { ...item, index };
-  showDetail.value = true;
+    selectedItem.value = { ...item, index };
+    showDetail.value = true;
 }
 
 function hideModal() {
-  showDetail.value = false;
-  selectedItem.value = null;
+    showDetail.value = false;
+    selectedItem.value = null;
 }
 
-function removeItem(index) {
-  store.items.splice(index, 1);
-  hideModal();
+function removeItem(index, count) {
+  const item = inventoryStore.items[index];
+  console.log(item);
+  if (item.count > 0) {
+    console.log("test");
+    inventoryStore.removeItem(index, count);
+    hideModal();
+  }
 }
 </script>
 
@@ -102,7 +107,7 @@ function removeItem(index) {
 }
 
 .slide-leave-active {
-  transform: translateX(30%);
+    transform: translateX(30%);
 }
 </style>
   

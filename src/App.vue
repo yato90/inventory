@@ -1,5 +1,4 @@
 <template>
-  <div id="app">
     <main>
       <div class="left_line">
         <div class="image">
@@ -28,7 +27,6 @@
       </div>
       <div class="skeletons_footer"></div>
     </footer>
-  </div>
 </template>
 
 <script setup>

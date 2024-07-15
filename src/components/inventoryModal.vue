@@ -17,12 +17,17 @@
             <div class="stub" style="width: 80px; height: 10px; left: 66px; top: 172px"></div>
         </div>
         <div class="Divider" style="width: 220px; height: 1px; background: #4D4D4D"></div>
-        <button @click="remove">Удалить</button>
+        <div v-if="isDeleteBlockVisible" class="delete_block">
+            <input type="number" v-model="countToRemove" placeholder="Введите количество">
+            <button class="cancel" @click="hideDeleteBlock">Отмена</button>
+            <button class="confirm" @click="confirmRemove">Подтвердить</button>
+        </div>
+        <button v-else @click="showDeleteBlock" >Удалить</button>
     </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
   item: Object,
@@ -33,12 +38,23 @@ function close() {
   emit('close');
 }
 
-function remove() {
-  if (props.item.count > 1) {
-    props.item.count--;
-  } else {
-    emit('remove', props.item.index);
-  }
+const isDeleteBlockVisible = ref(false);
+const countToRemove = ref(0);
+
+function showDeleteBlock() {
+  isDeleteBlockVisible.value = true;
+}
+
+function hideDeleteBlock() {
+  isDeleteBlockVisible.value = false;
+  countToRemove.value = 0;
+}
+
+function confirmRemove() {
+    if (countToRemove.value > 0) {
+        emit('remove', props.item.index, countToRemove.value);
+    }
+    hideDeleteBlock();
 }
 </script>
 
@@ -59,9 +75,9 @@ function remove() {
     z-index: 10;
 }
 .itemImage{
-    width: 130px; 
-    height: 130px; 
     position: relative;
+    width: 130px; 
+    height: 130px;
     margin-top: 55px;
     margin-bottom: 30px;
 }
@@ -90,6 +106,7 @@ function remove() {
     left: 14.44px; 
     top: 0px;
     backdrop-filter: blur(12px);
+    position: absolute;
 }
 .skeletons_modal{
     position: relative;
@@ -103,6 +120,49 @@ button{
     background: #FF8888;
     border-radius: 8px;
 }
-
+input{
+    width: 210px; 
+    height: 40px; 
+    padding-left: 12px; 
+    box-sizing: border-box; 
+    background: #262626; 
+    border-radius: 4px; 
+    border: 1px solid #4D4D4D;
+    color: white; 
+    font-size: 14px; 
+    font-family: Inter; 
+    font-weight: 500;
+    margin-top: 20px;
+}
+.cancel{
+    width: 88px;
+    background: white; 
+    border-radius: 8px; 
+    border: none; 
+    color: #2D2D2D; 
+    font-size: 14px; 
+    font-family: 'SF Pro Display', sans-serif; 
+    font-weight: 400; 
+    cursor: pointer;
+    margin-right: 10px;
+}
+.confirm{
+    width: 112px;
+    background: #FA7272; 
+    border-radius: 8px; 
+    border: none; 
+    color: white; 
+    font-size: 14px; 
+    font-family: 'SF Pro Display', sans-serif; 
+    font-weight: 400; 
+    cursor: pointer;
+}
+.delete_block{
+    width: 252px;
+    height: 133px;
+    background: rgba(38.25, 38.25, 38.25, 0.60);
+    border: 1px #4D4D4D solid;
+    backdrop-filter: blur(16px);
+}
 </style>
   
