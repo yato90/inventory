@@ -1,5 +1,5 @@
 <template>
-    <div @click="toggleDetails" class="inventory_item" >
+    <div class="inventory_item" >
         <div class="item">
             <div class="item_backround1" :style="`background: ${item.color1}`"></div>
             <div class="item_backround2" :style="`background: ${item.color2}`"></div>
@@ -8,10 +8,6 @@
             <div class="count_border"></div>
             <div class="itemCounter">{{item.count}}</div>
         </div>
-    </div>
-    <div v-if="showDetail" class="item-details">
-        <p>{{ item.description }}</p>
-        <button @click.stop="removeItem">Удалить</button>
     </div>
 </template>
 

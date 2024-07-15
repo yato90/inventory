@@ -1,60 +1,29 @@
 <template>
-    <!--
-    <div class="inventory">
-        <div class="row">
-            <div class="item" style="border-left: none;"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-        </div>
-        <div class="row">
-            <div class="item" style="border-left: none;"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-        </div>
-        <div class="row">
-            <div class="item" style="border-left: none;"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-        </div>
-        <div class="row">
-            <div class="item" style="border-left: none;"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-        </div>
-        <div class="row" style="border-bottom: none;">
-            <div class="item" style="border-left: none;"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-        </div>
-    </div>
-    -->
-    <div class="inventory">
-        <div v-for="(row, rowIndex) in grid" :key="rowIndex" class="row" :style="itemStyle(rowIndex)">
-            <div v-for="(item, colIndex) in row" :key="colIndex" class="item" :style="itemStyle(rowIndex, colIndex)">
-                <InventoryItem v-if="item" :item="item" :index="item.index" />
+    <div class="inventory-container">
+        <div class="inventory">
+            <div v-for="(row, rowIndex) in grid" :key="rowIndex" class="row" :style="itemStyle(rowIndex)">
+                <div v-for="(item, colIndex) in row" :key="colIndex" class="item" :style="itemStyle(rowIndex, colIndex)">
+                    <InventoryItem @click="showModal(item, index)" v-if="item" :item="item" :index="item.index" />
+                </div>
             </div>
         </div>
+        <transition name="slide">
+            <inventoryModal v-if="showDetail" :item="selectedItem" @close="hideModal" @remove="removeItem" />
+        </transition>
     </div>
-    <!-- <InventoryItem v-for="(item, index) in items" :key="index" :item="item" :index="index" /> -->
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import { useInventoryStore } from '../stores/inventory.js';
 import InventoryItem from './InventoryItem.vue';
+import inventoryModal from './inventoryModal.vue';
 
 const store = useInventoryStore();
 const items = ref(store.items);
+
+const showDetail = ref(false);
+const selectedItem = ref(null);
 
 const rows = 5;
 const cols = 5;
@@ -80,9 +49,29 @@ function itemStyle(rowIndex, colIndex) {
         borderBottom: rowIndex === rows - 1 ? 'none' : '',
     };
 }
+
+function showModal(item, index) {
+  selectedItem.value = { ...item, index };
+  showDetail.value = true;
+}
+
+function hideModal() {
+  showDetail.value = false;
+  selectedItem.value = null;
+}
+
+function removeItem(index) {
+  store.items.splice(index, 1);
+  hideModal();
+}
 </script>
 
 <style scoped>
+.inventory-container {
+  position: relative;
+  width: max-content;
+  margin: auto;
+}
 .inventory {
     display: inline-flex;
     flex-direction: column;
@@ -103,6 +92,17 @@ function itemStyle(rowIndex, colIndex) {
     height: 100px;
     /*position: relative;*/
     border-left: 1px #4D4D4D solid
+}
+.slide-enter-from{
+    transform: translateX(30%);
+}
+
+.slide-enter-active, .slide-leave-active {
+    transition: transform 0.3s ease;
+}
+
+.slide-leave-active {
+  transform: translateX(30%);
 }
 </style>
   
